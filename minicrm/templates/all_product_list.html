@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>All Products</h2>
+
+    {% if role == "Admin" or role == "Manager" %}
+      <a href="{% url 'inventory:product_add' %}?next=all_products" class="btn btn-primary">
+        + Add Product
+      </a>
+    {% endif %}
+  </div>
+
+
+  {% if products %}
+    <div class="list-group">
+      {% for i in products %}
+        <a href="{% url 'inventory:product_detail' i.id %}?next=all_products"
+           class="list-group-item list-group-item-action mb-2 p-3 rounded-3 shadow-sm d-flex align-items-center justify-content-between product-card text-decoration-none text-dark">
+
+          <div>
+            <h3 class="mb-1 fw-semibold">{{ i.name }}</h3>
+
+            {% if i.stock > 0 %}
+              <p class="mb-0 text-muted small">
+                <i class="fa-solid fa-tag me-1"></i> ₹{{ i.selling_price }}
+                &nbsp;&nbsp;
+                <i class="fa-solid fa-boxes-stacked me-1"></i> {{ i.stock }}
+                &nbsp;&nbsp;
+                <i class="fa-solid fa-barcode me-1"></i> SKU: {{ i.sku }}
+              </p>
+
+
+            {% else %}
+              <p class="out-of-stock mb-0">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> OUT OF STOCK
+              </p>
+            {% endif %}
+          </div>
+
+          {% if i.image %}
+            <img src="{{ i.image.url }}" alt="{{ product.name }}" class="product-thumb">
+          {% else %}
+            <img src="{% static 'images/box.png' %}" alt="No image" class="product-thumb">
+          {% endif %}
+
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No products found.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

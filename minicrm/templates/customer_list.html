@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow-sm rounded-3 p-3">
+        <h3 class="text-center mb-3">Customer List</h3>
+        {% if user_role == 'Admin' or user_role == 'Manager' %}
+        <div class="text-end mb-3">
+            <a href="{% url 'customers:customer_add' %}" class="btn btn-success">+ Add Customer</a>
+        </div>
+        {% endif %}
+
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+
+                    {% if user_role == 'Admin' or user_role == 'Manager' %}
+                    <th class="text-nowrap" style="width: 130px;">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for c in customers %}
+                <tr>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>{{ c.phone }}</td>
+                    <td>{{ c.address }}</td>
+
+                    {% if user_role == 'Admin' or user_role == 'Manager' %}
+              <td class="text-nowrap">
+               <a href="{% url 'customers:customer_update' c.id %}" class="btn btn-primary me-2 px-3 py-1">Edit</a>
+                <a href="{% url 'customers:customer_delete' c.id %}" class="btn btn-danger px-3 py-1">Delete</a>
+              </td>
+                    {% endif %}
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No customers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}

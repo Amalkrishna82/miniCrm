@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{% block title %}MiniCrm{% endblock %}</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="{% static 'vendors/feather/feather.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/ti-icons/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <link rel="stylesheet" href="{% static 'vendors/datatables.net-bs4/dataTables.bootstrap4.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/ti-icons/css/themify-icons.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'js/select.dataTables.min.css' %}">
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="{% static 'css/vertical-layout-light/style.css' %}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="{% static 'images/myminilogo.png' %}" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+
+</head>
+<body style="background-color:#2c9299;">
+  <div class="container-scroller">
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a class="navbar-brand brand-logo mr-5" href="{% url 'core:dashboard' %}" ><img src="{% static 'images/mylogo.png' %}" class="mr-2" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="{% url 'core:dashboard' %}"><img src="{% static 'images/myminilogo.png' %}" alt="logo"/></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <span class="icon-menu"></span>
+        </button>
+        <ul class="navbar-nav mr-lg-2">
+<li class="nav-item nav-search d-none d-lg-block">
+  <form action="{% url 'core:global_search' %}" method="get" class="input-group">
+    <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+      <span class="input-group-text" id="search">
+        <i class="icon-search"></i>
+      </span>
+    </div>
+    <input type="text"
+           class="form-control"
+           name="q"
+           id="navbar-search-input"
+           placeholder="Search now"
+           aria-label="search"
+           aria-describedby="search"
+           value="{{ request.GET.q|default:'' }}">
+  </form>
+</li>
+
+
+        </ul>
+<ul class="navbar-nav navbar-nav-right">
+          {% if request.user.is_authenticated and user_role == "Admin" %}
+<li class="nav-item dropdown">
+  <a class="nav-link count-indicator dropdown-toggle" id="userDropdown" href="#" data-toggle="dropdown">
+   <i class="fa fa-users"></i>
+  </a>
+  <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="userDropdown">
+    <p class="mb-0 font-weight-normal float-left dropdown-header">User Management</p>
+
+    <!-- Add User -->
+    <a class="dropdown-item preview-item" href="{% url 'accounts:adminadduser' %}">
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-primary">
+          <i class="ti-user mx-0"></i>
+        </div>
+      </div>
+      <div class="preview-item-content">
+        <h6 class="preview-subject font-weight-normal">Add New User</h6>
+        <p class="font-weight-light small-text mb-0 text-muted">
+          Create a new company user
+        </p>
+      </div>
+    </a>
+
+    <!-- Approve Users -->
+    <a class="dropdown-item preview-item" href="{% url 'accounts:pending_user_list' %}">
+
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-warning">
+          <i class="ti-check-box mx-0"></i>
+        </div>
+      </div>
+      <div class="preview-item-content">
+        <h6 class="preview-subject font-weight-normal">Approve Requests</h6>
+        <p class="font-weight-light small-text mb-0 text-muted">
+          Review pending user approvals
+        </p>
+      </div>
+    </a>
+
+    <!-- All Users -->
+    <a class="dropdown-item preview-item" href="{% url 'accounts:user_list' %}">
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-success">
+          <i class="ti-view-list-alt mx-0"></i>
+        </div>
+      </div>
+      <div class="preview-item-content">
+        <h6 class="preview-subject font-weight-normal">All Users</h6>
+        <p class="font-weight-light small-text mb-0 text-muted">
+          View and manage company users
+        </p>
+      </div>
+    </a>
+  </div>
+</li>
+{% endif %}
+<li class="nav-item dropdown">
+  <a class="nav-link count-indicator dropdown-toggle" id="companyDropdown" href="#" data-toggle="dropdown">
+    <i class="fa fa-building"></i>
+  </a>
+  <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="companyDropdown">
+    <p class="mb-0 font-weight-normal float-left dropdown-header">Company Management</p>
+
+    <!-- Switch Company -->
+    <a class="dropdown-item preview-item" href="{% url 'accounts:select_company' %}">
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-primary">
+          <i class="fas fa-exchange-alt mx-0"></i>
+        </div>
+      </div>
+      <div class="preview-item-content">
+        <h6 class="preview-subject font-weight-normal">Switch Company</h6>
+        <p class="font-weight-light small-text mb-0 text-muted">
+          Change to another company account
+        </p>
+      </div>
+    </a>
+
+    <!-- Start New Company -->
+    <a class="dropdown-item preview-item" href="{% url 'accounts:start_company' %}">
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-success">
+          <i class="fas fa-plus mx-0"></i>
+        </div>
+      </div>
+      <div class="preview-item-content">
+        <h6 class="preview-subject font-weight-normal">Start New Company</h6>
+        <p class="font-weight-light small-text mb-0 text-muted">
+          Create a new company account
+        </p>
+      </div>
+    </a>
+
+    <!-- Join Company -->
+    <a class="dropdown-item preview-item" href="{% url 'accounts:join_company' %}">
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-warning">
+          <i class="fas fa-link mx-0"></i>
+        </div>
+      </div>
+      <div class="preview-item-content">
+        <h6 class="preview-subject font-weight-normal">Join Company</h6>
+        <p class="font-weight-light small-text mb-0 text-muted">
+          Request to join an existing company
+        </p>
+      </div>
+    </a>
+
+  </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link d-flex align-items-center" href="{% url 'accounts:logout' %}">
+    <i class="ti-power-off text-danger mr-2"></i>
+    <span>Logout</span>
+  </a>
+</li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+          <span class="icon-menu"></span>
+        </button>
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_settings-panel.html -->
+      <div class="theme-setting-wrapper">
+        <div id="settings-trigger"><i class="ti-settings"></i></div>
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close ti-close"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
+      <!-- partial -->
+      <!-- partial:partials/_sidebar.html -->
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+
+    <!-- Dashboard -->
+<li class="nav-item active">
+  <a class="nav-link" href="{% url 'core:dashboard' %}"
+     style="color: #ffffff; font-weight: 600;">
+    <i class="fa fa-home menu-icon" style="color: #ffffff;"></i>
+         <span class="menu-title">Dashboard</span>
+      </a>
+    </li>
+
+<!-- Users -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#users" aria-expanded="false" aria-controls="users">
+    <i class="ti-user menu-icon"></i>
+    <span class="menu-title">Users</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="users">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'accounts:adminadduser' %}">Add User</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'accounts:user_list' %}">All Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'accounts:pending_user_list' %}">Pending Requests</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<!-- Inventory -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#inventory" aria-expanded="false" aria-controls="inventory">
+    <i class="ti-archive menu-icon"></i>
+    <span class="menu-title">Inventory</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="inventory">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'inventory:all_products' %}">Products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'inventory:category_list' %}">Categories</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<!-- Orders -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#orders" aria-expanded="false" aria-controls="orders">
+    <i class="ti-shopping-cart menu-icon"></i>
+    <span class="menu-title">Orders</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="orders">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'transaction:order_list' %}">All Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'transaction:order_pending' %}">Pending Orders</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<!-- Service -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#service" aria-expanded="false" aria-controls="service">
+    <i class="ti-settings menu-icon"></i>
+    <span class="menu-title">Service</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="service">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'transaction:service_list' %}">Service Requests</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'transaction:completed_service' %}">Completed Services</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<!-- Leads -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#leads" aria-expanded="false" aria-controls="leads">
+    <i class="ti-briefcase menu-icon"></i>
+    <span class="menu-title">Leads</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="leads">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customers:lead_list' %}">All Leads</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customers:lead_add' %}">Add Lead</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<!-- Customers -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#customers" aria-expanded="false" aria-controls="customers">
+    <i class="ti-id-badge menu-icon"></i>
+    <span class="menu-title">Customers</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="customers">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customers:customer_list' %}">All Customers</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'customers:customer_add' %}">Add Customer</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<!-- Leave -->
+<li class="nav-item">
+  <a class="nav-link" data-toggle="collapse" href="#leave" aria-expanded="false" aria-controls="leave">
+    <i class="ti-calendar menu-icon"></i>
+    <span class="menu-title">Leave</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="leave">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:leave_create' %}">Apply Leave</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'core:leave_list' %}">Leave Requests</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+
+  </ul>
+</nav>
+
+      {% block content %}
+        hello
+        {% endblock %}
+      </div>
+      </div>
+
+
+
+<footer class="footer bg-white shadow-sm py-4 mt-auto border-top">
+  <div class="container">
+
+    <!-- Main Footer -->
+    <div class="row align-items-center text-center text-md-start">
+      <div class="col-md-8 mb-3 mb-md-0">
+        <h6 class="fw-bold text-dark mb-1">MiniCRM – CRM & Inventory Management</h6>
+        <p class="text-muted small mb-0">
+          MiniCRM is a web-based CRM and inventory management system built using Python, Django,
+          SQLite, and the Skydash Admin UI. It supports multi-company access, role-based authentication,
+          customer management, leads, products, sales orders, and automated stock tracking.
+        </p>
+      </div>
+
+      <!-- Right Section -->
+      <div class="col-md-4 text-center text-md-end">
+        <p class="small text-muted mb-1">Designed & Developed by <strong>Amalkrishna</strong></p>
+        <p class="small mb-0">
+          Hand-crafted with <i class="ti-heart text-danger"></i>
+        </p>
+      </div>
+    </div>
+
+    <hr class="my-3">
+
+    <!-- Bottom Strip -->
+    <div class="row text-center">
+      <div class="col">
+        <p class="text-muted small mb-0">
+          © {{ now|date:"Y" }} MiniCRM. All Rights Reserved.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+
+  <!-- container-scroller -->
+
+  <!-- plugins:js -->
+  <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="{% static 'vendors/chart.js/Chart.min.js' %}"></script>
+  <script src="{% static 'vendors/datatables.net/jquery.dataTables.js' %}"></script>
+  <script src="{% static 'vendors/datatables.net-bs4/dataTables.bootstrap4.js' %}"></script>
+  <script src="{% static 'js/dataTables.select.min.js' %}"></script>
+
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/template.js' %}"></script>
+  <script src="{% static 'js/settings.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="{% static 'js/dashboard.js' %}"></script>
+  <script src="{% static 'js/Chart.roundedBarCharts.js' %}"></script>
+  <!-- End custom js for this page-->
+</body>
+
+</html>

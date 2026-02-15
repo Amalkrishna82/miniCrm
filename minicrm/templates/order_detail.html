@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container bg-white w-75 my-5 p-4 shadow-lg rounded">
+
+  <h2 class="fw-bold mb-4">Order #{{ order.id }}</h2>
+
+
+  <div class="row g-3">
+
+    <div class="col-md-6">
+      <p><strong>Customer:</strong>
+        {% if order.customer %}
+          {{ order.customer.name }}
+        {% else %}
+          <span class="text-danger">Deleted Customer</span>
+        {% endif %}
+      </p>
+
+      {% if order.customer %}
+      <p><strong>Phone:</strong> {{ order.customer.phone }}</p>
+      <p><strong>Address:</strong>
+        {{ order.customer.address|default:"No address available." }}
+      </p>
+      {% endif %}
+
+      <p><strong>Status:</strong> {{ order.status }}</p>
+    </div>
+
+    <div class="col-md-6">
+      <p><strong>Total Amount:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+      {% if user_role == "Admin" %}
+      <p><strong>Total Profit:</strong> ₹{{ order.total_profit|floatformat:2 }}</p>
+      {% endif %}
+
+      <p><strong>Created By:</strong>
+        {% if order.created_by %}
+          {{ order.created_by.username }}
+        {% else %}
+          <span class="text-danger">Deleted User</span>
+        {% endif %}
+      </p>
+
+      <p><strong>Created On:</strong> {{ order.created_at|date:"d M Y, H:i" }}</p>
+    </div>
+
+  </div>
+
+  <hr class="my-4">
+
+
+  <h4 class="mt-4 mb-3">Products in this Order</h4>
+
+  {% if order.items.exists %}
+    <div class="list-group">
+      {% for item in order.items.all %}
+        <div class="list-group-item mb-3 p-3 rounded shadow-sm d-flex align-items-center">
+
+          <div style="flex:0 0 80px;">
+            {% if item.product and item.product.image %}
+              <img src="{{ item.product.image.url }}" class="img-thumbnail" width="80" height="80">
+            {% else %}
+              <img src="{% static 'images/default.jpg' %}" class="img-thumbnail" width="80" height="80">
+            {% endif %}
+          </div>
+
+
+          <div style="flex:1; margin-left:15px;">
+            <h5 class="mb-1">
+              {% if item.product %}
+                {{ item.product.name }}
+              {% else %}
+                <span class="text-danger">Deleted Product</span>
+              {% endif %}
+            </h5>
+
+            <p class="mb-0">
+              Qty: {{ item.quantity }} <br>
+              Selling Price: ₹{{ item.selling_price }} <br>
+              Profit: ₹{{ item.profit|floatformat:2 }}
+            </p>
+          </div>
+
+
+          {% if item.product %}
+            <div class="text-end" style="flex:0 0 140px;">
+              {% if user_role in "Admin Manager" %}
+                <a href="{% url 'inventory:product_edit' item.product.id %}" class="btn btn-sm btn-primary mb-1">
+                  <i class="fa-solid fa-pen"></i> Edit
+                </a>
+                <a href="{% url 'inventory:product_delete' item.product.id %}" class="btn btn-sm btn-danger mb-1"
+                   onclick="return confirm('Are you sure you want to delete this product?');">
+                  <i class="fa-solid fa-trash"></i> Delete
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info mt-3">No products in this order.</div>
+  {% endif %}
+
+
+  <div class="mt-4">
+    <a href="{% url 'transaction:order_list' %}" class="btn btn-danger">Back to Orders</a>
+  </div>
+
+</div>
+{% endblock %}

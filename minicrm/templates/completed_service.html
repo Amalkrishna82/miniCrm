@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-dark">Completed Services</h1>
+    <a href="{% url 'transaction:service_add' %}" class="btn btn-primary px-4 py-2 shadow-sm fw-semibold">
+      Add Service
+    </a>
+  </div>
+
+  {% if services %}
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+
+    {% for i in services %}
+    <div class="col">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body">
+
+          <h5 class="card-title fw-bold text-success">
+           Service #{{ i.id }}</h5>
+
+          {% if i.status == "Completed" %}
+          <span class="badge text-light bg-success ms-2 px-3 py-1 mb-2 fw-semibold">Completed</span>
+           {% endif %}
+
+
+
+          <p class="card-text text-muted mb-3">
+            <strong>Customer:</strong> {{ i.customer.name }}<br>
+            <strong>Product:</strong> {{ i.product.name }}<br>
+          </p>
+
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'transaction:service_edit' i.id %}" class="btn btn-warning btn-sm px-3 fw-semibold">Edit</a>
+            <a href="{% url 'transaction:service_delete' i.id %}" class="btn btn-danger btn-sm px-3 mx-2 fw-semibold">Delete</a>
+            <a href="{% url 'transaction:service_detail' i.id %}" class="btn btn-info btn-sm px-3 fw-semibold text-white">View</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+  <div class="alert alert-info mt-4">No completed services found.</div>
+  {% endif %}
+</div>
+
+<style>
+  body {
+    background-color: #f9fbfd;
+  }
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+</style>
+
+{% endblock %}

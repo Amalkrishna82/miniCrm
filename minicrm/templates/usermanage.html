@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card shadow p-4 rounded-3">
+        <h3 class="text-center mb-4">Edit User - {{ company_user.user.username }}</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="submit" class="btn btn-primary"> Save Changes</button>
+                <button type="submit" name="delete" class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to delete this user?');">
+                     Delete User
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

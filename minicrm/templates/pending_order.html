@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-dark">Pending Orders</h1>
+  </div>
+
+  {% if orders %}
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for order in orders %}
+    <div class="col">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body">
+          <h5 class="card-title fw-bold text-secondary">Order #{{ order.id }}</h5>
+
+          <p class="card-text text-muted mb-3">
+            <strong>Customer:</strong> {{ order.customer.name }}<br>
+            <strong>Total:</strong> ₹{{ order.total_amount|floatformat:2 }}<br>
+            <strong>Status:</strong> {{ order.status }}
+          </p>
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'transaction:order_edit' order.id %}" class="btn btn-warning btn-sm px-3 fw-semibold">Edit</a>
+            <a href="{% url 'transaction:order_delete' order.id %}" class="btn btn-danger btn-sm px-3 fw-semibold">Delete</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="alert alert-info mt-4">No pending orders.</div>
+  {% endif %}
+</div>
+
+<style>
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+</style>
+
+{% endblock %}

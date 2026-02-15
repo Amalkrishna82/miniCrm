@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm rounded-4 p-4">
+    <h2 class="text-center mb-4">Pending Join Requests</h2>
+
+    {% if pending_users %}
+      <div class="list-group">
+        {% for i in pending_users %}
+          <div class="list-group-item d-flex justify-content-between align-items-center p-3 mb-2 rounded-3 shadow-sm">
+            <div>
+              <h5 class="mb-1">{{ i.user.username }}</h5>
+              <p class="mb-0 text-muted">
+                {{ i.user.email }} • Requested Role: <strong>{{ i.role }}</strong>
+              </p>
+            </div>
+            <a href="{% url 'accounts:user_action' i.id %}" class="btn btn-outline-primary btn-sm">
+              Review
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-center text-muted">No pending user requests at the moment.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

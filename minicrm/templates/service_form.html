@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+.real-radio {
+    display: none;
+}
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+.radio-option {
+    padding: 10px 20px;
+    border: 2px solid #dcdcdc;
+    background: #f8f8f8;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+    user-select: none;
+}
+.radio-option:hover {
+    background: #eaffea;
+    border-color: #28a745;
+}
+#id_customer,
+#id_lead,
+#id_product {
+    color: #000 !important;
+    opacity: 1 !important;
+}
+.radio-option.active {
+    background: #dfffe0;
+    border-color: #28a745;
+    font-weight: 600;
+}
+.field-section {
+    margin-bottom: 20px;
+}
+</style>
+
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white text-center">
+            <h4 class="mb-0">{{ form.instance.pk|yesno:"Edit Service,Add Service" }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="radio-group">
+                    <label class="radio-option active" id="opt_customer">
+                        <input type="radio" name="select_type" value="customer" class="real-radio" checked>
+                        Customer
+                    </label>
+                    <label class="radio-option" id="opt_lead">
+                        <input type="radio" name="select_type" value="lead" class="real-radio">
+                        Lead
+                    </label>
+                </div>
+
+                <div id="customer_box" class="field-section">
+                    <label class="form-label fw-bold">Customer</label>
+                    {{ form.customer }}
+                </div>
+
+                <div id="lead_box" class="field-section" style="display:none;">
+                    <label class="form-label fw-bold">Lead</label>
+                    {{ form.lead }}
+                    <a href="{% url 'customers:lead_add' %}" class="btn btn-sm btn-success mt-2">+ Add New Lead</a>
+                </div>
+
+                {% for f in form.visible_fields %}
+                    {% if f.name != "customer" and f.name != "lead" and f.name != "select_type" %}
+                        {{ f|as_crispy_field }}
+                    {% endif %}
+                {% endfor %}
+
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <a href="{% url 'transaction:service_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const customerBox = document.getElementById("customer_box");
+const leadBox = document.getElementById("lead_box");
+const optCustomer = document.getElementById("opt_customer");
+const optLead = document.getElementById("opt_lead");
+
+optCustomer.onclick = () => {
+    optCustomer.classList.add("active");
+    optLead.classList.remove("active");
+    customerBox.style.display = "block";
+    leadBox.style.display = "none";
+    optCustomer.querySelector("input").checked = true;
+};
+
+optLead.onclick = () => {
+    optLead.classList.add("active");
+    optCustomer.classList.remove("active");
+    customerBox.style.display = "none";
+    leadBox.style.display = "block";
+    optLead.querySelector("input").checked = true;
+};
+</script>
+
+{% endblock %}

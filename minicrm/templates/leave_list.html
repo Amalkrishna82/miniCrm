@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">Leave Requests</h3>
+    <a href="{% url 'core:leave_create' %}" class="btn btn-primary btn-sm">
+      + Add Leave
+    </a>
+  </div>
+
+  {% if user_role == "Admin" %}
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3 fw-semibold">All Leave Requests</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Reason</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leave in leaves %}
+                <tr>
+                  <td>{{ leave.user.username }}</td>
+                  <td>{{ leave.user.companyuser_set.first.role }}</td>
+                  <td>{{ leave.reason }}</td>
+                  <td>{{ leave.start_date }}</td>
+                  <td>{{ leave.end_date }}</td>
+                  <td>
+                    <span class="badge
+                      {% if leave.status == 'Approved' %} bg-success
+                      {% elif leave.status == 'Rejected' %} bg-danger
+                      {% else %} bg-warning text-dark {% endif %}">
+                      {{ leave.status }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if leave.status == 'Pending' %}
+                      <form method="post" action="{% url 'core:leave_action' leave.id 'approve' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                      </form>
+                      <form method="post" action="{% url 'core:leave_action' leave.id 'reject' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                      </form>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="7" class="text-center text-muted">No leave requests found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  {% elif user_role == "Manager" %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="mb-3 fw-semibold">My Leave Requests</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Reason</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leave in leaves %}
+                {% if leave.user == request.user %}
+                  <tr>
+                    <td>{{ leave.reason }}</td>
+                    <td>{{ leave.start_date }}</td>
+                    <td>{{ leave.end_date }}</td>
+                    <td>
+                      <span class="badge
+                        {% if leave.status == 'Approved' %} bg-success
+                        {% elif leave.status == 'Rejected' %} bg-danger
+                        {% else %} bg-warning text-dark {% endif %}">
+                        {{ leave.status }}
+                      </span>
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3 fw-semibold">Staff Leave Requests</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Staff</th>
+                <th>Reason</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leave in leaves %}
+                {% if leave.user != request.user and leave.user.companyuser_set.first.role == "Staff" %}
+                  <tr>
+                    <td>{{ leave.user.username }}</td>
+                    <td>{{ leave.reason }}</td>
+                    <td>{{ leave.start_date }}</td>
+                    <td>{{ leave.end_date }}</td>
+                    <td>
+                      <span class="badge
+                        {% if leave.status == 'Approved' %} bg-success
+                        {% elif leave.status == 'Rejected' %} bg-danger
+                        {% else %} bg-warning text-dark {% endif %}">
+                        {{ leave.status }}
+                      </span>
+                    </td>
+                    <td>
+                      {% if leave.status == 'Pending' %}
+                        <form method="post" action="{% url 'core:leave_action' leave.id 'approve' %}" class="d-inline">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form method="post" action="{% url 'core:leave_action' leave.id 'reject' %}" class="d-inline">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+              {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">No staff leave requests.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3 fw-semibold">My Leave Requests</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Reason</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leave in leaves %}
+                <tr>
+                  <td>{{ leave.reason }}</td>
+                  <td>{{ leave.start_date }}</td>
+                  <td>{{ leave.end_date }}</td>
+                  <td>
+                    <span class="badge
+                      {% if leave.status == 'Approved' %} bg-success
+                      {% elif leave.status == 'Rejected' %} bg-danger
+                      {% else %} bg-warning text-dark {% endif %}">
+                      {{ leave.status }}
+                    </span>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center text-muted">No leave records found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

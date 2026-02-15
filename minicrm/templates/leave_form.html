@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h4 class="mb-3 fw-semibold">Request Leave</h4>
+
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <a href="{% url 'core:leave_list' %}" class="btn btn-light ms-2">Cancel</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

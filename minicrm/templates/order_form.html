@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+
+
+{% block content %}
+<style>
+    #id_customer,
+    #id_status {
+        color: #000 !important;
+        opacity: 1 !important;
+    }
+</style>
+<div class="container w-75 p-4 my-5 bg-light rounded shadow-sm">
+    <h2 class="text-center mb-4 py-2 bg-primary text-white rounded">
+        {% if order %}Edit{% else %}Add{% endif %} Order
+    </h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <h4 class="mt-4">Products</h4>
+        <div id="product-container"></div>
+
+        <button type="button" class="btn btn-primary mt-2" id="add-product">
+            <i class="fa fa-plus me-1"></i> Add Product
+        </button>
+
+        <div class="mt-4 text-end">
+            <h5 id="total-price">Total: ₹0.00</h5>
+            <button type="submit" class="btn btn-success px-4 me-2">Save</button>
+            <a href="{% url 'transaction:order_list' %}" class="btn btn-secondary px-4">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+const container = document.getElementById("product-container");
+const addBtn = document.getElementById("add-product");
+const totalEl = document.getElementById("total-price");
+
+function addProductRow() {
+    const row = document.createElement("div");
+    row.className = "d-flex align-items-center mb-2 gap-2 p-2 rounded shadow-sm";
+    row.style.backgroundColor = "#d0e7ff";
+
+    row.innerHTML = `
+        <div style="flex:0 0 80px;">
+            <img src="{% static 'images/box.jpg' %}" class="product-img img-thumbnail" width="80" height="80">
+        </div>
+        <select name="product" class="form-select" style="flex:2; min-height:40px;" required>
+            <option value="">-- Select Product --</option>
+            {% for p in products %}
+                {% if p.stock > 0 %}
+                <option value="{{ p.id }}"
+                    data-selling="{{ p.selling_price }}"
+                    data-min="{{ p.min_selling_price }}"
+                    data-img="{{ p.image.url|default_if_none:'/static/images/default_product.jpg' }}">
+                    {{ p.name }}
+                </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <input type="number" name="quantity" class="form-control quantity" placeholder="Qty" min="1" style="flex:1; min-height:40px;" required>
+        <input type="number" name="selling_price" class="form-control price" placeholder="Selling Price" min="0" step="0.01" style="flex:1; min-height:40px;" required>
+        <div style="flex:1;">
+            <small class="text-muted"></small>
+        </div>
+        <div class="fw-bold line-total text-end" style="flex-basis:100px;">₹0.00</div>
+        <button type="button" class="btn btn-danger remove-btn" style="width:40px; height:40px; padding:0;">
+            <i class="fa fa-times"></i>
+        </button>
+    `;
+
+    const select = row.querySelector("select");
+    const qtyInput = row.querySelector(".quantity");
+    const priceInput = row.querySelector(".price");
+    const minInfo = row.querySelector("small");
+    const img = row.querySelector(".product-img");
+    const lineTotal = row.querySelector(".line-total");
+    const removeBtn = row.querySelector(".remove-btn");
+
+    function updatePriceInfo() {
+        if (!select.value) {
+            priceInput.placeholder = "Selling Price";
+            minInfo.textContent = "";
+            img.src = "{% static 'images/box.jpg' %}";
+        } else {
+            priceInput.placeholder = "₹" + select.selectedOptions[0].dataset.selling;
+            minInfo.textContent = "Min: ₹" + select.selectedOptions[0].dataset.min;
+            img.src = select.selectedOptions[0].dataset.img;
+        }
+        updateLineTotal();
+    }
+
+    function updateLineTotal() {
+        const qty = parseFloat(qtyInput.value) || 0;
+        const price = parseFloat(priceInput.value) || parseFloat(priceInput.placeholder.replace("₹","")) || 0;
+        lineTotal.textContent = "₹" + (qty * price).toFixed(2);
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let total = 0;
+        container.querySelectorAll(".line-total").forEach(el => {
+            total += parseFloat(el.textContent.replace("₹","")) || 0;
+        });
+        totalEl.textContent = "Total: ₹" + total.toFixed(2);
+    }
+
+    select.addEventListener("change", updatePriceInfo);
+    qtyInput.addEventListener("input", updateLineTotal);
+    priceInput.addEventListener("input", updateLineTotal);
+    removeBtn.addEventListener("click", () => {
+        row.remove();
+        updateTotal();
+    });
+
+    container.appendChild(row);
+}
+
+// Add first row by default
+addBtn.addEventListener("click", addProductRow);
+addProductRow();
+</script>
+
+{% endblock %}

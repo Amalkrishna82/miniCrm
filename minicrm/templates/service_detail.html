@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <div class="card shadow-lg p-4 rounded-3">
+        <h2 class="text-info mb-3">Service Details</h2>
+
+        <p><strong>Customer:</strong> {{ service.customer.name }}</p>
+        <p><strong>Product:</strong> {{ service.product.name }}</p>
+        <p><strong>Service Type:</strong> {{ service.service_type }}</p>
+        <p><strong>Assigned To:</strong> {{ service.assigned_to }}</p>
+        <p><strong>Service Date:</strong> {{ service.service_date|date:"d M Y" }}</p>
+
+        <h5 class="mt-3">Description</h5>
+        <p>{{ service.description }}</p>
+
+        {% if service.issue_description %}
+        <h5>Issue Description</h5>
+        <p>{{ service.issue_description }}</p>
+        {% endif %}
+
+<!--        {% if user_role == 'Admin' %}-->
+<!--        <div class="alert alert-success mt-3">-->
+<!--            <strong>Note:</strong> Profit information can be viewed here if service billing is extended.-->
+<!--        </div>-->
+<!--        {% endif %}-->
+
+        <div class="mt-3 text-end">
+            <a href="{% url 'transaction:service_list' %}" class="btn btn-secondary">Back to Services</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
