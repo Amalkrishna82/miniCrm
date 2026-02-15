@@ -157,14 +157,10 @@ class PendingUserListView(View):
             messages.error(request, "Access denied.")
             return redirect('core:dashboard')
 
-        pending_users = CompanyUser.objects.filter(
-            company_id=company_id,
-            status='Pending'
-        )
+        pending_users = CompanyUser.objects.filter(company_id=company_id, status='Pending')
 
         return render(request, 'pending_users.html', {
-            'pending_users': pending_users
-        })
+            'pending_users': pending_users})
 
     def post(self, request):
         company_id = get_user_company(request)
@@ -249,8 +245,7 @@ class AdminAddUserView(View):
                 company=selected_company,
                 role=role_choice,
                 salary=salary,
-                status='Approved'
-            )
+                status='Approved' )
             messages.success(request, "User added successfully.")
             return redirect('accounts:user_list')
 
@@ -301,7 +296,7 @@ class UserManageView(View):
 
         if form_instance.is_valid():
             company_user = form_instance.save(commit=False)
-            company_user.company_id = company_id  # auto-assign admin's company
+            company_user.company_id = company_id 
             company_user.save()
             messages.success(request, "User updated successfully.")
             return redirect('accounts:user_list')
